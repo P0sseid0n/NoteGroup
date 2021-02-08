@@ -4,20 +4,20 @@
         <div>
             <div>
                 <!-- :checked='todo[0]' -->
-                <input type="checkbox" :id="'todo-' + index"  v-model="todo[0]"> 
+                <input type="checkbox" :id="'todo-' + index"> 
                 <label :for="'todo-' + index" @click="$parent.checkToDo()"><font-awesome-icon :icon="['fas', 'check']" /></label>
             </div>
             <div>
-                <input type="text" v-if="editingTodo === index" :value="todo[1]">
+                <input type="text" v-if="editingTodo === index" minlength="2" maxlength="75">
                 <h1 v-else>{{ todo[1] }}</h1>
             </div>
         </div>
         <div v-if="mouseOver == index && editingTodo === false || editingTodo === index">
             <div v-if="editingTodo === index">
-                <button @click="editTodo()"><span><font-awesome-icon :icon="['fas', 'check']" /></span> <p>Confirm</p></button>
+                <button @click="editTodo(false)"><span><font-awesome-icon :icon="['fas', 'check']" /></span> <p>Confirm</p></button>
             </div>
             <div v-else>
-                <button @click="editingTodo = index"><span><font-awesome-icon :icon="['fas', 'pen']" /></span> <p>Edit</p></button>
+                <button @click="editTodo(index)"><span><font-awesome-icon :icon="['fas', 'pen']" /></span> <p>Edit</p></button>
                 <button @click="deleteTodo(index)"><span><font-awesome-icon :icon="['fas', 'trash']" /></span> <p>Delete</p></button>
             </div>
         </div>
@@ -57,12 +57,20 @@ export default {
             this.$root.$emit('saveNotes')
         },
 
-        editTodo(){
-            const input = document.querySelectorAll('.todo')[this.editingTodo].querySelector('input[type=text]')
-            
-            this.$props.note.todos[this.editingTodo][1] = input.value
-            this.editingTodo = false
-            this.$root.$emit('saveNotes')
+        async editTodo(edit){
+            if(!isNaN(edit) && edit !== false){
+                this.editingTodo = edit
+                const note = await this.$props.note.todos[this.editingTodo][1]
+
+                document.querySelectorAll('.todo')[this.editingTodo].querySelector('input[type=text]').value = note
+            } else {
+                const input = document.querySelectorAll('.todo')[this.editingTodo].querySelector('input[type=text]')
+                
+                this.$props.note.todos[this.editingTodo][1] = input.value.slice(0, 75)
+
+                this.editingTodo = false
+                this.$root.$emit('saveNotes')
+            }
         },
 
         observeMouseToDo(index){

@@ -23,7 +23,6 @@ export default {
         return {
             notes: [ 
                 { title: 'First note', done: false, todos: [ [false ,'Mouse over here to see options'] ], notes: [ ['Note - 1'] ] }, 
-                { title: 'Group - 1', done: true, todos: [ [true ,'Todo - 2'] ], notes: [ ['Note - 2'] ]  }, 
             ],
             noteSelected: 0
         }
