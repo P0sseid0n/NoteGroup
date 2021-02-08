@@ -6,7 +6,8 @@
         </header>
         <main>
             <List :notes="notes" />
-            <Display :note="notes[noteSelected]" />
+            <Display :note="notes[noteSelected]" v-if="notes.length > 0" />
+            <NoDisplay v-else />
         </main>
     </div>
 </template>
@@ -14,18 +15,51 @@
 <script>
 import List from './components/List.vue'
 import Display from './components/Display.vue'
+import NoDisplay from './components/NoDisplay.vue'
 
 export default {
     name: 'App',
     data(){
         return {
-            notes: [ { title: 'Note - 1' }, { title: 'Note - 2' }, { title: 'Note - 3' } ],
+            notes: [ 
+                { title: 'First note', done: false, todos: [ [false ,'Mouse over here to see options'] ], notes: [ ['Note - 1'] ] }, 
+                { title: 'Group - 1', done: true, todos: [ [true ,'Todo - 2'] ], notes: [ ['Note - 2'] ]  }, 
+            ],
             noteSelected: 0
         }
     },
     components: {
         List, 
-        Display
+        Display,
+        NoDisplay
+    },
+    created(){
+        if(localStorage.getItem('notes')) this.notes = JSON.parse(localStorage.getItem('notes'))
+
+        this.notes.forEach((note, index) => {
+            note.id = index
+
+            if(!String(note.title.trim())) note.title = 'New Group - ' + index
+
+            let done = true
+            note.todos.forEach((todo, index) => {
+                todo[2] = index
+
+                if(!String(todo[1].trim())) todo[1] = 'New todo'
+
+                if(!todo[0]) done = false
+            })
+            note.notes.forEach((note, index) => {
+                note[1] = index
+            })
+
+            note.done = done
+        })
+    },
+    mounted(){
+        this.$root.$on('saveNotes', () => {
+            localStorage.setItem('notes', JSON.stringify(this.notes))
+        })
     }
 }
 </script>
@@ -43,6 +77,23 @@ export default {
     --depth-2: rgb(40,40,50);
     --depth-3: rgb(50,50,60);
     --depth-4: rgb(60,60,70);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(75,75,85); 
+    border-radius: 32px;
+    transition: .3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(85,85,95); 
 }
 
 *{
@@ -81,6 +132,7 @@ html,body, #app{
 
                 &:hover{
                     color: var(--blue-light);
+                    text-decoration: underline;
                 }
             }
         }
@@ -104,7 +156,7 @@ svg, path{
         border-right: 1px solid rgb(65,65,75);
     }
 
-    #display{
+    #display, #noDisplay{
         width: 75%;
         border-left: 1px solid rgb(65,65,75);
     }

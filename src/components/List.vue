@@ -1,14 +1,14 @@
 <template>
 <div id="list">
     <header>
-        <button @click="addNote()" ><span><font-awesome-icon :icon="['fas', 'plus']" /></span>  Add new group</button>
+        <button @click="addGroup()" ><span><font-awesome-icon :icon="['fas', 'plus']" /></span>  Add new group</button>
     </header>
     <hr>
     <main>
-        <div class="group" v-for="(note, index) in notes" :key="index">
+        <div class="group" v-for="(note, index) in notes" :key="note.id" @click="setSelected(index)">
             <div>
-                <input type="checkbox" :id="'checkbox-' + index">
-                <label :for="'checkbox-' + index"><font-awesome-icon :icon="['fas', 'check']" /></label>
+                <input type="checkbox" :id="'group-' + index" :checked='note.done'>
+                <label :for="'group-' + index"><font-awesome-icon :icon="['fas', 'check']" /></label>
             </div>
             <div>
                 <h1> {{ note.title }} </h1>
@@ -20,24 +20,14 @@
 
 <script>
 export default {
-    data(){
-        return{
-            groups: [ [ 'Note - 1', 'Description - 1' ], [ 'Note - 2', 'Description - 2' ] ]
-        }
-    },
     props: {
         notes: Array
     },
     methods: {
-        addListeners(){
-            document.querySelectorAll('.group').forEach((group, index) => {
-                group.addEventListener('click', () => {
-                    this.setSelected(index)
-                })
-            })
-        },
-
         setSelected(id){
+            this.$root.$emit('setSelected')
+            if(id < 0) id = 0
+
             const target = document.querySelectorAll('.group')[id]
             const selected = document.querySelector('.selected')
 
@@ -48,42 +38,37 @@ export default {
             if(selected) selected.classList.remove('selected')
 
             this.$parent.noteSelected = id
+
+            this.$root.$emit('selecting')
         },
 
-        async addNote(){
-            const newId = this.$props.notes.length + 1
-            await this.$props.notes.push({ title: 'Note - ' + newId })
-            this.addListeners()
-            this.setSelected(newId - 1)
+        async addGroup(){
+            const notes = this.$props.notes
+            let id = 0
+
+            if(notes.length > 0) id = notes[notes.length - 1].id + 1
+
+            await this.$props.notes.push({ title: 'New Group - ' + id, id,  done: false, todos: [], notes: [] })
+            this.setSelected(id)
+
+            this.$root.$emit('saveNotes')
         }
+    },
+    mounted(){
+        this.$root.$on('deleteGroup', group => {
+            if(this.$parent.notes.length > 0) this.setSelected(group)
+        })
+        this.$root.$on('createGroup', this.addGroup)
     },
     created(){
         setTimeout(() => {
-            this.addListeners()
-            this.setSelected(0)
+            if(this.$parent.notes.length > 0) this.setSelected(0)
         }, 1)
     }
 }
 </script>
 
 <style lang="scss">
-
-::-webkit-scrollbar {
-    width: 10px;
-}
-::-webkit-scrollbar-track {
-    background: transparent; 
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgb(75,75,85); 
-    border-radius: 32px;
-    transition: .3s;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgb(85,85,95); 
-}
 #list{
     background-color: var(--depth-1);
     height: 100%;
@@ -105,6 +90,7 @@ export default {
             font-weight: 700;
             text-transform: uppercase;
             border-radius: 12px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 
             &:hover{
                 transition: .2s;
@@ -129,7 +115,7 @@ export default {
 
     > main{
         height: calc(100% - 66px);
-        overflow: auto;
+        overflow-y: auto;
         padding: 0 4px;
         padding-top: 16px;
 
@@ -143,6 +129,7 @@ export default {
             flex-direction: row;
             align-items: center;
             border-radius: 12px;
+            box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
 
             &:hover{
                 background-color: var(--groups-hovered);
@@ -163,6 +150,7 @@ export default {
 
                 input{
                     display: none;
+                    pointer-events: none;
 
                     ~ label{
                         display: block;
@@ -177,6 +165,7 @@ export default {
                         color: transparent;
                         transition: 0.5s;
                         margin-right: 16px;
+                        pointer-events: none;
                     }
                 }
 
@@ -191,7 +180,7 @@ export default {
 
             div:last-child{
                 h1{
-                    font-size: 20px;
+                    font-size: 16px;
                     opacity: 0.8;
                 }
             }
