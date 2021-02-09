@@ -1,8 +1,7 @@
 <h2 align="center">NoteGroup</h2>
 <p align="center">NoteGroup is a ToDo list stored in groups.</p>
+
 ___
-
-
 
 
 <p align="center">
@@ -21,7 +20,7 @@ ___
 
 ___
 
-<img src="https://readme-maker.herokuapp.com/uploads/414ff2e1adcfed29-preview.gif" width="1200">
+<img src="preview.gif" width="1200">
 
 
 
