@@ -45,6 +45,8 @@ export default {
 
             document.querySelector('.displaying').classList.remove('displaying')
             document.querySelector(`#${this.displaying}`).classList.add('displaying')
+
+            this.checkToDo()
         },
 
         async deleteGroup(){
@@ -64,6 +66,8 @@ export default {
                 })
     
                 note.done = done
+
+                
             }, 1)
         }
     },

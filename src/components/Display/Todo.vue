@@ -3,9 +3,9 @@
     <li class="todo" v-for="(todo, index) in note.todos" :key="todo[2]" @mouseenter="observeMouseToDo(index)" @mouseleave="observeMouseToDo(null)">
         <div>
             <div>
-                <!-- :checked='todo[0]' -->
-                <input type="checkbox" :id="'todo-' + index"> 
-                <label :for="'todo-' + index" @click="$parent.checkToDo()"><font-awesome-icon :icon="['fas', 'check']" /></label>
+                
+                <input type="checkbox" :id="'todo-' + index" :checked='todo[0]'> 
+                <label :for="'todo-' + index" @click="todoCheck(index)"><font-awesome-icon :icon="['fas', 'check']" /></label>
             </div>
             <div>
                 <input type="text" v-if="editingTodo === index" minlength="2" maxlength="75">
@@ -82,6 +82,12 @@ export default {
             if(index == null) return 
     
             document.querySelectorAll('.todo')[index].classList.add('seeAll')
+        },
+
+        todoCheck(id){
+            this.$props.note.todos[id][0] = !this.$props.note.todos[id][0]
+            this.$root.$emit('saveNotes')
+            this.$parent.checkToDo()
         }
     },
     mounted(){
