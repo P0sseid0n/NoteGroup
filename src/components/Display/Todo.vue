@@ -9,7 +9,7 @@
             </div>
             <div>
                 <input type="text" v-if="editingTodo === index" minlength="2" maxlength="75">
-                <h1 v-else>{{ todo[1] }}</h1>
+                <h1 v-else @dblclick="editTodo(index)">{{ todo[1] }}</h1>
             </div>
         </div>
         <div v-if="mouseOver == index && editingTodo === false || editingTodo === index">
@@ -62,7 +62,10 @@ export default {
                 this.editingTodo = edit
                 const note = await this.$props.note.todos[this.editingTodo][1]
 
-                document.querySelectorAll('.todo')[this.editingTodo].querySelector('input[type=text]').value = note
+                const input =document.querySelectorAll('.todo')[this.editingTodo].querySelector('input[type=text]')
+
+                input.value = note
+                input.focus()
             } else {
                 const input = document.querySelectorAll('.todo')[this.editingTodo].querySelector('input[type=text]')
                 
@@ -94,6 +97,8 @@ export default {
         this.$root.$on('setSelected', () => {
             if(this.editingTodo) this.editTodo()
         })
+
+        this.$root.$on('selecting', () => this.editingTodo(false))
     }
 }
 </script>
@@ -101,10 +106,6 @@ export default {
 <style lang="scss">
 ul{
     list-style-type: none;
-
-    li{
-        font-size: 18px;
-    }
 
     .todo{
         display: flex;
@@ -118,7 +119,7 @@ ul{
             display: flex;
             align-items: center;
             h1{
-                font-size: 20px;
+                font-size: 18px;
             }
 
             > div:first-of-type input{
@@ -138,13 +139,13 @@ ul{
             }
         }
 
-        div:last-of-type:not(div:first-of-type) {
-            margin-top: 8px;
+        > div:last-of-type:not(div:first-of-type) {
+            margin-top: 10px;
             button{
                 background: transparent;
                 outline: 0;
                 border: 0;
-                padding: 8px 16px;
+                padding: 4px 16px;
                 cursor: pointer;
                 font-weight: 700;
 

@@ -28,6 +28,8 @@ export default {
             this.$root.$emit('setSelected')
             if(id < 0) id = 0
 
+            this.$root.$emit('selecting')
+
             const target = document.querySelectorAll('.group')[id]
             const selected = document.querySelector('.selected')
 
@@ -39,7 +41,6 @@ export default {
 
             this.$parent.noteSelected = id
 
-            this.$root.$emit('selecting')
         },
 
         async addGroup(){

@@ -2,8 +2,8 @@
 <div id="display">
 <header>
     <div>
-        <input v-if="editingGroup" type="text" v-model="noteTitle" maxlength="31" minlength="1">
-        <h1 v-else> {{ note.title }} </h1>
+        <input v-if="editingGroup" type="text" v-model="noteTitle" maxlength="31" minlength="1" autofocus>
+        <h1 v-else @dblclick="editingGroup = true"> {{ note.title }} </h1>
     </div>
     <div>
         <button v-if="editingGroup" @click="editingGroup = false"><font-awesome-icon :icon="['fas', 'check']"/> Confirm</button>

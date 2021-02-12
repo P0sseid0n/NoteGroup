@@ -151,14 +151,28 @@ svg, path{
     flex-direction: row;
 
     #list{
-        width: 25%;
+        width: 30%;
         border-right: 1px solid rgb(65,65,75);
     }
 
     #display, #noDisplay{
-        width: 75%;
+        width: 70%;
         border-left: 1px solid rgb(65,65,75);
     }
 }
+
+// @media screen and (max-width: 968px) {
+//     #app > main{
+
+//         #list, #display, #noDisplay{
+//             width: 100%;
+//             border: 0;
+//         }
+
+//         #display, #noDisplay{
+//             display: none;
+//         }
+//     }
+// }
 
 </style>
