@@ -72,7 +72,7 @@ export default {
         }
     },
     mounted(){
-        this.$root.$on('selecting', () => this.editingGroup = false)
+        this.$root.$on('selecting-title', () => this.editingGroup = false)
     }, 
     computed: {
         noteTitle: {

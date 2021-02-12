@@ -1,6 +1,9 @@
 <template>
 <ul>
-    <li class="todo" v-for="(todo, index) in note.todos" :key="todo[2]" @mouseenter="observeMouseToDo(index)" @mouseleave="observeMouseToDo(null)">
+    <li class="todo" v-for="(todo, index) in note.todos" :key="todo[2]" 
+    @mouseenter="observeMouseToDo(index)" @mouseleave="observeMouseToDo(null)"
+     draggable="true" @dragstart="dragTodo($event, true)" @dragover.stop @dragend="dragTodo($event, false)" 
+     @dragover.prevent @drop.stop @drop.prevent="dropTodo">
         <div>
             <div>
                 
@@ -40,6 +43,31 @@ export default {
         note: Object
     },
     methods:{
+        dragTodo(e, state){
+            if(state){
+                e.dataTransfer.setData('todo', this.mouseOver)
+    
+                e.target.style.opacity =  '0.4'
+            } else {
+                e.target.style.opacity =  '1'
+            }
+        },
+        dropTodo(e){
+            const liDrop = e.path.find(el => el.tagName == 'LI')
+            const idNew = liDrop.querySelector('input[type=checkbox]').id.replace('todo-', '')
+            const idOld = e.dataTransfer.getData('todo')
+            const todos = this.$props.note.todos
+
+            const current = todos[idOld]
+            const target = todos[idNew]
+
+            todos[idNew] = current
+            todos[idOld] = target
+
+
+            this.$root.$emit('saveNotes')
+            
+        },
         addTodo(){
             const todos = this.$props.note.todos
             let id = -1
@@ -62,12 +90,19 @@ export default {
                 this.editingTodo = edit
                 const note = await this.$props.note.todos[this.editingTodo][1]
 
-                const input =document.querySelectorAll('.todo')[this.editingTodo].querySelector('input[type=text]')
+
+                const li = document.querySelectorAll('.todo')[this.editingTodo]
+                li.draggable = false
+
+                const input = li.querySelector('input[type=text]')
 
                 input.value = note
                 input.focus()
             } else {
-                const input = document.querySelectorAll('.todo')[this.editingTodo].querySelector('input[type=text]')
+                const li = document.querySelectorAll('.todo')[this.editingTodo]
+                li.draggable = true
+
+                const input = li.querySelector('input[type=text]')
                 
                 this.$props.note.todos[this.editingTodo][1] = input.value.slice(0, 75)
 
@@ -94,11 +129,8 @@ export default {
         }
     },
     mounted(){
-        this.$root.$on('setSelected', () => {
-            if(this.editingTodo) this.editTodo()
-        })
+        this.$root.$on('selecting-todo', () => this.editingTodo !== false ? this.editTodo(false) : '')
 
-        this.$root.$on('selecting', () => this.editingTodo(false))
     }
 }
 </script>
@@ -114,6 +146,7 @@ ul{
         margin-bottom: 16px;
         border-radius: 16px;
         padding: 8px 16px;
+        cursor: move;
 
         > div:first-of-type{
             display: flex;
