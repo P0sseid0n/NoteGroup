@@ -12,7 +12,7 @@
                 <label :for="'todo-' + index" @click="todoCheck(index)"><font-awesome-icon :icon="['fas', 'check']" /></label>
             </div>
             <div>
-                <input type="text" v-if="editingTodo === index" minlength="2" maxlength="75">
+                <input type="text" @keypress.enter="editTodo(false)" v-if="editingTodo === index" minlength="2" maxlength="75">
                 <h1 v-else @dblclick="editTodo(index)">{{ todo[1] }}</h1>
             </div>
         </div>

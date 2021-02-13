@@ -42,6 +42,10 @@ export default {
 
             let done = true
             note.todos.forEach((todo, index) => {
+                if(!todo) {
+                    note.todos.splice(index, 1)
+                    this.$root.$emit('saveNotes')
+                }
                 todo[2] = index
 
                 if(!String(todo[1].trim())) todo[1] = 'New todo'

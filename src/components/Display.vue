@@ -2,7 +2,7 @@
 <div id="display">
 <header>
     <div>
-        <input v-if="editingGroup" type="text" v-model="noteTitle" maxlength="31" minlength="1" autofocus>
+        <input v-if="editingGroup" @keypress.enter="editingGroup = false" type="text" v-model="noteTitle" maxlength="31" minlength="1" autofocus>
         <h1 v-else @dblclick="editingGroup = true"> {{ note.title }} </h1>
     </div>
     <div>
