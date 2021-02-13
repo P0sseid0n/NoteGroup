@@ -3,6 +3,7 @@
     <li class="todo" v-for="(todo, index) in note.todos" :key="todo[2]" 
     @mouseenter="observeMouseToDo(index)" @mouseleave="observeMouseToDo(null)"
      draggable="true" @dragstart="dragTodo($event, true)" @dragover.stop @dragend="dragTodo($event, false)" 
+     @dragover="dragOverTodo($event, true)" @dragleave="dragOverTodo($event, false)"
      @dragover.prevent @drop.stop @drop.prevent="dropTodo">
         <div>
             <div>
@@ -36,20 +37,34 @@ export default {
     data(){
         return{
             mouseOver: null,
-            editingTodo: false
+            editingTodo: false,
+            dragging: false
         }
     },
     props: {
         note: Object
     },
     methods:{
+        dragOverTodo(e, state){
+            if(state){
+                const li = e.path.find(el => el.tagName == 'LI')
+
+                li.style.backgroundColor = 'rgba(230, 230, 250, 0.2)'
+            } else {
+                const li = e.path.find(el => el.tagName == 'LI')
+                li.removeAttribute('style')
+            }
+        },
         dragTodo(e, state){
+            this.dragging = state
             if(state){
                 e.dataTransfer.setData('todo', this.mouseOver)
     
                 e.target.style.opacity =  '0.4'
             } else {
                 e.target.style.opacity =  '1'
+
+                document.querySelectorAll('ul > li.todo').forEach(el => el.removeAttribute('style'))
             }
         },
         dropTodo(e){
