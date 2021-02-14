@@ -26,8 +26,7 @@ export default {
     methods: {
         setSelected(id){
             this.$root.$emit('selecting-todo')
-            if(id < 0) id = 0
-
+            this.$root.$emit('selecting-title')
 
             const target = document.querySelectorAll('.group')[id]
             const selected = document.querySelector('.selected')
@@ -39,8 +38,6 @@ export default {
             if(selected) selected.classList.remove('selected')
 
             this.$parent.noteSelected = id
-
-            this.$root.$emit('selecting-title')
         },
 
         async addGroup(){
@@ -56,9 +53,22 @@ export default {
         }
     },
     mounted(){
-        this.$root.$on('deleteGroup', group => {
-            if(this.$parent.notes.length > 0) this.setSelected(group)
+        this.$root.$on('deleteGroup', async () => {
+            const notes = this.$parent.notes
+            const selected = this.$parent.noteSelected
+            
+            if(notes.length > 1) this.setSelected(selected > 0 ? selected - 1 : 1)
+
+            notes.splice(selected, 1)
+            if(selected == 0){
+                this.$parent.noteSelected = selected
+            } else {
+                this.$parent.noteSelected = [...document.querySelectorAll('.group')].findIndex(group => group.classList.contains('selected'))
+            }
+
+            this.$root.$emit('saveNotes')
         })
+
         this.$root.$on('createGroup', this.addGroup)
     },
     created(){

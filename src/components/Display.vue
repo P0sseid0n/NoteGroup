@@ -9,7 +9,7 @@
         <button v-if="editingGroup" @click="editingGroup = false"><font-awesome-icon :icon="['fas', 'check']"/> Confirm</button>
         <div v-else>
             <button  @click="editingGroup = true"> <font-awesome-icon :icon="['fas', 'pen']"/> Edit</button>
-            <button @click="deleteGroup()"> <font-awesome-icon :icon="['fas', 'trash']" /> Delete</button>
+            <button @click="$root.$emit('deleteGroup')"> <font-awesome-icon :icon="['fas', 'trash']" /> Delete</button>
         </div>
     </div>
 </header>
@@ -47,12 +47,6 @@ export default {
             document.querySelector(`#${this.displaying}`).classList.add('displaying')
 
             this.checkToDo()
-        },
-
-        async deleteGroup(){
-           await this.$parent.notes.splice(this.$parent.noteSelected, 1); 
-           this.$root.$emit('deleteGroup', this.$parent.noteSelected - 1)
-           this.$root.$emit('saveNotes')
         },
 
         checkToDo(){
