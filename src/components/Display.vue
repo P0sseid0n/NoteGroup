@@ -14,21 +14,26 @@
     </div>
 </header>
 <nav>
-    <button class="displaying" id="todos" @click="changeDisplaying('todos')">To Do</button>
-    <!-- <button id="notes" @click="changeDisplaying('notes')">Notes</button> -->
+    <button :class="{'displaying':  displaying == 'todos'}" id="todos" @click="displaying = 'todos'; checkToDo()">To Do</button>
+    <button :class="{'displaying':  displaying == 'notes'}" id="notes" @click="displaying = 'notes'">Notes</button>
 </nav>
 <main>
-    <ToDo v-if="displaying == 'todos'" :note="note" />
+    <ul>
+        <ToDo v-if="displaying == 'todos'" :note="note" />
+        <Notes v-if="displaying == 'notes'" :note="note" />
+    </ul>
 </main>
 </div>
 </template>
 
 <script>
 import ToDo from './Display/Todo.vue'
+import Notes from './Display/Notes.vue'
 
 export default {
     components:{
-        ToDo
+        ToDo,
+        Notes
     },
     props: {
         note: Object
@@ -40,15 +45,6 @@ export default {
         }
     },
     methods: {
-        changeDisplaying(displaying){
-            this.displaying = displaying
-
-            document.querySelector('.displaying').classList.remove('displaying')
-            document.querySelector(`#${this.displaying}`).classList.add('displaying')
-
-            this.checkToDo()
-        },
-
         checkToDo(){
             setTimeout(() => {
                 const note = this.$parent.notes[this.$parent.noteSelected]
@@ -101,13 +97,18 @@ export default {
         input{
             height: 56px;
             display: block;
-            background: rgb(80,80,90);
-            border: 2px solid rgb(120,120,140);
+            background: var(--depth-4);
+            border: 3px solid rgb(80,80,100);
             width: 512px;
             padding: 0 8px;
             border-radius: 16px;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: bold;
+            outline: 0;
+
+            &:focus{
+                border: 3px solid rgb(120,120,140);
+            }
         }
 
         button{
@@ -166,7 +167,10 @@ export default {
         height: calc(100% - (64px + 64px));
         overflow-y: auto;
 
-        
+        ul{
+            list-style-type: none;
+            padding: 0 8px;
+        }
     }
 }
 </style>

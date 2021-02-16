@@ -8,7 +8,7 @@
             <List :notes="notes" />
             <Display :note="notes[noteSelected]" v-if="notes.length > 0" />
             <NoDisplay v-else />
-        </main>
+        </main> 
     </div>
 </template>
 
@@ -22,7 +22,12 @@ export default {
     data(){
         return {
             notes: [ 
-                { title: 'First note', done: false, todos: [ [false ,'Mouse over here to see options'] ], notes: [ ['Note - 1'] ] }, 
+                { 
+                    done: false, 
+                    title: 'First note', 
+                    todos: [ [false ,'Mouse over here to see options'] ], 
+                    notes: [ ['Click to edit this note', "Type the note content" ] ] 
+                }, 
             ],
             noteSelected: 0
         }
@@ -53,7 +58,7 @@ export default {
                 if(!todo[0]) done = false
             })
             note.notes.forEach((note, index) => {
-                note[1] = index
+                note[2] = index
             })
 
             note.done = done
@@ -72,9 +77,9 @@ export default {
     --groups: rgb(40,40,50);
     --groups-hovered: rgb(45,45,55);
 
-    --blue-light: hsl(200, 100%, 50%);
-    --blue: hsl(205, 100%, 50%);
-    --blue-dark: hsl(210, 100%, 50%);
+    --blue-light: rgb(0, 190, 255);
+    --blue: rgb(0, 160, 255);
+    --blue-dark: rgb(0, 130, 255);
 
     --depth-1: rgb(30,30,40);
     --depth-2: rgb(40,40,50);

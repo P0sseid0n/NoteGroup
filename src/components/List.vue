@@ -46,7 +46,7 @@ export default {
 
             if(notes.length > 0) id = notes[notes.length - 1].id + 1
 
-            await this.$props.notes.push({ title: 'New Group - ' + id, id,  done: false, todos: [], notes: [] })
+            await this.$props.notes.push({ title: 'New Group - ' + id, id,  done: true, todos: [], notes: [] })
             this.setSelected(id)
 
             this.$root.$emit('saveNotes')

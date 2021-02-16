@@ -1,5 +1,5 @@
 <template>
-<ul>
+<div id="todo">
     <li class="todo" v-for="(todo, index) in note.todos" :key="todo[2]" 
     @mouseenter="observeMouseToDo(index)" @mouseleave="observeMouseToDo(null)"
      draggable="true" @dragstart="dragTodo($event, true)" @dragover.stop @dragend="dragTodo($event, false)" 
@@ -29,7 +29,7 @@
     <li>
         <button id="add-todo" @click="addTodo()"> <span><font-awesome-icon :icon="['fas', 'plus']" /></span> Add to do </button>
     </li>
-</ul>
+</div>
 </template>
 
 <script>
@@ -151,15 +151,13 @@ export default {
 </script>
 
 <style lang="scss">
-ul{
-    list-style-type: none;
-
+#todo{
     .todo{
         display: flex;
         flex-direction: column;
         background-color: rgba(230,230,250, .075);
         margin-bottom: 16px;
-        border-radius: 16px;
+        border-radius: 8px;
         padding: 8px 16px;
         cursor: move;
 
@@ -259,10 +257,11 @@ ul{
         color: white;
         font-weight: bold;
         text-transform: uppercase;
-        border: 2px dashed rgb(120,120,130);
-        transition: color .3s;
+        border: 2px dashed rgb(100,100,120);
+        transition: .3s;
 
         &:hover{
+            border: 2px dashed rgb(150,150,170);
             color: var(--blue-light);
         }
 
