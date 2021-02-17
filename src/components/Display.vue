@@ -2,7 +2,7 @@
 <div id="display">
 <header>
     <div>
-        <input v-if="editingGroup" @keypress.enter="editingGroup = false" type="text" v-model="noteTitle" maxlength="31" minlength="1" autofocus>
+        <input v-if="editingGroup" @keypress.enter="editingGroup = false" type="text" v-model="groupTitle" maxlength="25" minlength="1" required autofocus>
         <h1 v-else @dblclick="editingGroup = true"> {{ note.title }} </h1>
     </div>
     <div>
@@ -65,12 +65,14 @@ export default {
         this.$root.$on('selecting-title', () => this.editingGroup = false)
     }, 
     computed: {
-        noteTitle: {
+        groupTitle: {
             get(){
                 return this.$props.note.title
             },
             set(text){
-                if(text.length <= 31 && text.length >= 2) this.$props.note.title = text
+                const newText = text.trim()
+
+                if(newText.length <= 25 && newText.length >= 2) this.$props.note.title = newText
                 this.$root.$emit('saveNotes')
             }
         }
@@ -99,7 +101,8 @@ export default {
             display: block;
             background: var(--depth-4);
             border: 3px solid rgb(80,80,100);
-            width: 512px;
+            width: 100%;
+            max-width: 512px;
             padding: 0 8px;
             border-radius: 16px;
             font-size: 36px;
@@ -107,9 +110,13 @@ export default {
             outline: 0;
 
             &:focus{
-                border: 3px solid rgb(120,120,140);
+                border: 3px solid rgb(140,140,160);
             }
+
         }
+            input:invalid{
+                border: 3px solid rgb(140,80,100) !important;
+            }
 
         button{
             background-color: var(--blue);
@@ -120,8 +127,11 @@ export default {
             padding: 8px 8px;
             border-radius: 8px;
             cursor: pointer;
-            margin-right: 16px;
             box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px, rgba(17, 17, 26, 0.1) 0px 24px 80px;
+
+            &:not(button:last-of-type){
+                margin-right: 16px;
+            }
 
             &:hover{
                 transition: .2s;
@@ -170,6 +180,40 @@ export default {
         ul{
             list-style-type: none;
             padding: 0 8px;
+        }
+    }
+}
+
+@media screen and (max-width: 1048px) {
+    #display header{
+        flex-direction: column;
+        align-items: unset;
+        margin-bottom: 32px;
+
+        button{
+            margin-top: 8px;
+        }
+
+        input{
+            font-size: 28px;
+
+        }
+
+        h1{
+            font-size: 32px;
+        }
+    }
+}
+
+@media screen and (max-width: 868px) {
+    #display header{
+        input{
+            font-size: 24px;
+
+        }
+
+        h1{
+            font-size: 28px;
         }
     }
 }

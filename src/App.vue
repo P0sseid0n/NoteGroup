@@ -1,21 +1,23 @@
 <template>
-    <div id="app">
-        <header>
-            <h1>NoteGroup</h1>
-            <h4>Made by <a href="https://posseidon.netlify.app/" target="_blank" rel="noopener noreferrer">P0sseid0n</a></h4>
-        </header>
-        <main>
-            <List :notes="notes" />
-            <Display :note="notes[noteSelected]" v-if="notes.length > 0" />
-            <NoDisplay v-else />
-        </main> 
-    </div>
+<div id="app">
+    <header>
+        <h1>NoteGroup</h1>
+        <h4>Made by <a href="https://posseidon.netlify.app/" target="_blank" rel="noopener noreferrer">P0sseid0n</a></h4>
+    </header>
+    <main>
+        <List :notes="notes" />
+        <Display :note="notes[noteSelected]" v-if="notes.length > 0" />
+        <NoDisplay v-else />
+    </main> 
+    <ViewNav/>
+</div>
 </template>
 
 <script>
 import List from './components/List.vue'
 import Display from './components/Display.vue'
 import NoDisplay from './components/NoDisplay.vue'
+import ViewNav from './components/ViewNav.vue'
 
 export default {
     name: 'App',
@@ -26,16 +28,14 @@ export default {
                     done: false, 
                     title: 'First note', 
                     todos: [ [false ,'Mouse over here to see options'] ], 
-                    notes: [ ['Click to edit this note', "Type the note content" ] ] 
+                    notes: [ ['Click to edit this note', "" ] ] 
                 }, 
             ],
             noteSelected: 0
         }
     },
     components: {
-        List, 
-        Display,
-        NoDisplay
+        List, Display, NoDisplay, ViewNav
     },
     created(){
         if(localStorage.getItem('notes')) this.notes = JSON.parse(localStorage.getItem('notes'))
@@ -148,6 +148,19 @@ html,body, #app{
 
     > main{
         height: calc(100% - 72px);
+        display: flex;
+        flex-direction: row;
+
+        #list{
+            width: 400px;
+            border-right: 1px solid rgb(65,65,75);
+
+        }
+
+        #display, #noDisplay{
+            width: calc(100% - 400px);
+            border-left: 1px solid rgb(65,65,75);
+        }
     }
 }
 
@@ -155,33 +168,41 @@ svg, path{
     color: inherit;
 }
 
-#app > main{
-    display: flex;
-    flex-direction: row;
+@media screen and (max-width: 1048px) {
+    #app > main{
 
-    #list{
-        width: 30%;
-        border-right: 1px solid rgb(65,65,75);
-    }
+        #list{
+            width: 350px;
+        }
 
-    #display, #noDisplay{
-        width: 70%;
-        border-left: 1px solid rgb(65,65,75);
+        #display, #noDisplay{
+            width: calc(100% - 350px);
+        }
     }
 }
 
-// @media screen and (max-width: 968px) {
-//     #app > main{
+@media screen and (min-width: 768px) {
+    #list, #display, #noDisplay{
+        width: 100%;
+        border: 0;
 
-//         #list, #display, #noDisplay{
-//             width: 100%;
-//             border: 0;
-//         }
+        display: block !important;
+    }
+}
 
-//         #display, #noDisplay{
-//             display: none;
-//         }
-//     }
-// }
+@media screen and (max-width: 768px) {
+    #app > main{
+        height: calc(100% - 144px);
+
+        #list, #display, #noDisplay{
+            width: 100%;
+            border: 0;
+        }
+
+        #display, #noDisplay{
+            display: none;
+        }
+    }
+}
 
 </style>

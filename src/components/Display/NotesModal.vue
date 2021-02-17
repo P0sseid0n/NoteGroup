@@ -1,11 +1,11 @@
 <template>
 <div id="note"  @click.self="closeNote" >
     <div>
-        <input type="text" v-model="title">
+        <input type="text" v-model="note[0]" placeholder="Note title">
 
-        <textarea v-model="content"></textarea> 
+        <textarea v-model="note[1]" placeholder="Note content"></textarea> 
 
-        <button @click="closeNote"><font-awesome-icon :icon="['fas', 'times']" /></button>           
+        <button @click="closeNote">Close</button>           
     </div>
 </div>
 </template>
@@ -13,13 +13,12 @@
 <script>
 export default {
     props:{
-        title: String,
-        content: String
+        note: Array
     },
     methods:{
         closeNote(){
-            this.$emit('closeNote')
             this.$root.$emit('saveNotes')
+            this.$emit('closeNote')
         }
     }
 }
@@ -40,13 +39,18 @@ export default {
 
     > div{
         height: 70%;
-        width: 92%;
+        width: 90%;
         max-width: 1024px;
 
         background-color: var(--depth-4);
-        border-radius: 32px;
-        padding: 8px 16px;
+        border-radius: 24px;
+        padding: 16px;
         position: relative;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
 
         input, textarea{
             width: 100%;
@@ -68,10 +72,11 @@ export default {
 
         textarea{
             margin-top: 16px;
-            font-size: 20px;
+            font-size: 18px;
             resize: none;
             height: 70%;
             font-weight: 500;
+            padding-top: 8px;
         }
 
         button{
@@ -79,14 +84,11 @@ export default {
             border: 0;
             outline: 0;
             font-weight: 700;
-            font-size: 36px;
+            font-size: 28px;
             padding: 4px 16px;
             border-radius: 16px;
             margin-top: 8px;
             cursor: pointer;
-            position: absolute;
-            top: -44px;
-            right: -40px;
 
             &:hover{
                 background: var(--blue);

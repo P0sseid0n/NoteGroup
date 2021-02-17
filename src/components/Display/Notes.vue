@@ -1,14 +1,19 @@
 <template>
 <div id="notes">
-    <Modal v-if="showNote !== false" :title="note.notes[showNote][0]" :content="note.notes[showNote][1]" @closeNote="showNote = false"/>
+    <Modal v-if="showNote !== false" :note="note.notes[showNote]" @closeNote="showNote = false"/>
 
-    <li v-for="(note, index) in note.notes" :key="note[2]" @click="showNote = index" 
+
+    <li class="note" v-for="(note, index) in note.notes" :key="note[2]" @click="showNote = index" 
     @mouseenter="noteHovering = index" @mouseleave="noteHovering = null" >
         <div>
             <h1> {{ note[0] }} </h1>
             <button @click.stop @click="deleteNote(index)" v-if="noteHovering === index"><font-awesome-icon :icon="['fas', 'trash']" /></button>
         </div>
     </li>
+
+
+
+
     <li id="addNote" @click="addNote">
         <div>
             <h1><font-awesome-icon :icon="['fas', 'plus']" /></h1>
@@ -47,6 +52,9 @@ export default {
             this.$props.note.notes.splice(index, 1)
             this.$root.$emit('saveNotes')
         }
+    },
+    created(){
+        
     }
 }
 </script>

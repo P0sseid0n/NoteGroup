@@ -1,31 +1,32 @@
 <template>
 <div id="todo">
-    <li class="todo" v-for="(todo, index) in note.todos" :key="todo[2]" 
-    @mouseenter="observeMouseToDo(index)" @mouseleave="observeMouseToDo(null)"
-     draggable="true" @dragstart="dragTodo($event, true)" @dragover.stop @dragend="dragTodo($event, false)" 
-     @dragover="dragOverTodo($event, true)" @dragleave="dragOverTodo($event, false)"
-     @dragover.prevent @drop.stop @drop.prevent="dropTodo">
-        <div>
+    <draggable :list="note.todos" handle=".handle" ghost-class="dragging">
+        <li class="todo" v-for="(todo, index) in note.todos" :key="todo[2]" 
+        @mouseenter="observeMouseToDo(index)" @mouseleave="observeMouseToDo(null)">
             <div>
-                
-                <input type="checkbox" :id="'todo-' + index" :checked='todo[0]'> 
-                <label :for="'todo-' + index" @click="todoCheck(index)"><font-awesome-icon :icon="['fas', 'check']" /></label>
+                <div>
+                    <input type="checkbox" :id="'todo-' + index" :checked='todo[0]'> 
+                    <label :for="'todo-' + index" @click="todoCheck(index)"><font-awesome-icon :icon="['fas', 'check']" /></label>
+
+                </div>
+                <div>
+                    <input type="text" @keypress.enter="editTodo(false)" v-if="editingTodo === index" minlength="2" maxlength="75">
+                    <h1 v-else @dblclick="editTodo(index)">{{ todo[1] }}</h1>
+
+                    <button class="handle"><font-awesome-icon :icon="['fas', 'bars']" /></button>
+                </div>
             </div>
-            <div>
-                <input type="text" @keypress.enter="editTodo(false)" v-if="editingTodo === index" minlength="2" maxlength="75">
-                <h1 v-else @dblclick="editTodo(index)">{{ todo[1] }}</h1>
+            <div v-if="mouseOver == index && editingTodo === false || editingTodo === index">
+                <div v-if="editingTodo === index">
+                    <button @click="editTodo(false)"><span><font-awesome-icon :icon="['fas', 'check']" /></span> <p>Confirm</p></button>
+                </div>
+                <div v-else>
+                    <button @click="editTodo(index)"><span><font-awesome-icon :icon="['fas', 'pen']" /></span> <p>Edit</p></button>
+                    <button @click="deleteTodo(index)"><span><font-awesome-icon :icon="['fas', 'trash']" /></span> <p>Delete</p></button>
+                </div>
             </div>
-        </div>
-        <div v-if="mouseOver == index && editingTodo === false || editingTodo === index">
-            <div v-if="editingTodo === index">
-                <button @click="editTodo(false)"><span><font-awesome-icon :icon="['fas', 'check']" /></span> <p>Confirm</p></button>
-            </div>
-            <div v-else>
-                <button @click="editTodo(index)"><span><font-awesome-icon :icon="['fas', 'pen']" /></span> <p>Edit</p></button>
-                <button @click="deleteTodo(index)"><span><font-awesome-icon :icon="['fas', 'trash']" /></span> <p>Delete</p></button>
-            </div>
-        </div>
-    </li>  
+        </li>  
+    </draggable>
     <li>
         <button id="add-todo" @click="addTodo()"> <span><font-awesome-icon :icon="['fas', 'plus']" /></span> Add to do </button>
     </li>
@@ -33,56 +34,22 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable'
+
 export default {
     data(){
         return{
             mouseOver: null,
-            editingTodo: false,
-            dragging: false
+            editingTodo: false
         }
     },
     props: {
         note: Object
     },
+    components: {
+        draggable
+    },
     methods:{
-        dragOverTodo(e, state){
-            if(state){
-                const li = e.path.find(el => el.tagName == 'LI')
-
-                li.style.backgroundColor = 'rgba(230, 230, 250, 0.2)'
-            } else {
-                const li = e.path.find(el => el.tagName == 'LI')
-                li.removeAttribute('style')
-            }
-        },
-        dragTodo(e, state){
-            this.dragging = state
-            if(state){
-                e.dataTransfer.setData('todo', this.mouseOver)
-    
-                e.target.style.opacity =  '0.4'
-            } else {
-                e.target.style.opacity =  '1'
-
-                document.querySelectorAll('ul > li.todo').forEach(el => el.removeAttribute('style'))
-            }
-        },
-        dropTodo(e){
-            const liDrop = e.path.find(el => el.tagName == 'LI')
-            const idNew = liDrop.querySelector('input[type=checkbox]').id.replace('todo-', '')
-            const idOld = e.dataTransfer.getData('todo')
-            const todos = this.$props.note.todos
-
-            const current = todos[idOld]
-            const target = todos[idNew]
-
-            todos[idNew] = current
-            todos[idOld] = target
-
-
-            this.$root.$emit('saveNotes')
-            
-        },
         addTodo(){
             const todos = this.$props.note.todos
             let id = -1
@@ -105,24 +72,24 @@ export default {
                 this.editingTodo = edit
                 const note = await this.$props.note.todos[this.editingTodo][1]
 
-
                 const li = document.querySelectorAll('.todo')[this.editingTodo]
-                li.draggable = false
 
                 const input = li.querySelector('input[type=text]')
-
                 input.value = note
                 input.focus()
             } else {
                 const li = document.querySelectorAll('.todo')[this.editingTodo]
-                li.draggable = true
 
                 const input = li.querySelector('input[type=text]')
-                
-                this.$props.note.todos[this.editingTodo][1] = input.value.slice(0, 75)
 
+                const newText = input.value.trim()
+
+                if(newText.length > 0 && newText.length < 75) {
+                    this.$props.note.todos[this.editingTodo][1] = newText
+                    this.$root.$emit('saveNotes')
+                }
+                
                 this.editingTodo = false
-                this.$root.$emit('saveNotes')
             }
         },
 
@@ -159,7 +126,11 @@ export default {
         margin-bottom: 16px;
         border-radius: 8px;
         padding: 8px 16px;
-        cursor: move;
+
+        &.dragging{
+        background-color: rgba(230, 230, 250, 0.2);
+        }
+
 
         > div:first-of-type{
             display: flex;
@@ -168,21 +139,43 @@ export default {
                 font-size: 18px;
             }
 
-            > div:first-of-type input{
-                display: none;
+            > div:first-of-type {
+                width: 40px;
+
+                input{
+                    display: none;
+                }
             }
 
-            > div:last-of-type input{
-                height: 40px;
-                display: block;
-                background: rgb(80,80,90);
-                border: 2px solid rgb(120,120,140);
-                width: 768px;
-                padding: 0 8px;
-                border-radius: 8px;
-                font-size: 18px;
-                font-weight: bold;
-            }
+            > div:last-of-type {
+                width: calc(100% - 40px);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                
+
+                .handle{
+                    cursor: move;
+                    background: transparent;
+                    color: rgb(120,120,140);
+                    outline: 0;
+                    border: 0;
+                    font-size: 24px;
+                }
+
+                input{
+                    height: 36px;
+                    display: block;
+                    background: rgb(80,80,90);
+                    border: 2px solid rgb(120,120,140);
+                    width: 768px;
+                    padding: 0 8px;
+                    border-radius: 8px;
+                    font-size: 18px;
+                    font-weight: bold;
+                    outline: 0;
+                }
+            } 
         }
 
         > div:last-of-type:not(div:first-of-type) {
@@ -220,8 +213,8 @@ export default {
 
         input{
             ~ label{
-                width: 24px;
-                height: 24px;
+                width: 28px;
+                height: 28px;
                 border: 3px solid rgb(100,100,100);
                 border-radius: 25%;
                 display: flex;

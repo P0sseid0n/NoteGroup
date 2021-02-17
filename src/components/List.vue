@@ -5,23 +5,31 @@
     </header>
     <hr>
     <main>
-        <div class="group" v-for="(note, index) in notes" :key="note.id" @click="setSelected(index)">
-            <div>
-                <input type="checkbox" :id="'group-' + index" :checked='note.done'>
-                <label :for="'group-' + index"><font-awesome-icon :icon="['fas', 'check']" /></label>
+        <draggable :list="notes" handle=".handle" @end="dragged" ghost-class="dragging"> 
+            <div class="group" v-for="(note, index) in notes" :key="note.id" @click="setSelected(index)">
+                <div>
+                    <input type="checkbox" :id="'group-' + index" :checked='note.done'>
+                    <label :for="'group-' + index"><font-awesome-icon :icon="['fas', 'check']" /></label>
+                </div>
+                <div>
+                    <h1> {{ note.title }} </h1>
+                    <button class="handle"><font-awesome-icon :icon="['fas', 'bars']" /></button>
+                </div>
             </div>
-            <div>
-                <h1> {{ note.title }} </h1>
-            </div>
-        </div>
+        </draggable>
     </main>
 </div>
 </template>
 
 <script>
+import draggable from 'vuedraggable'
+
 export default {
     props: {
         notes: Array
+    },
+    components:{
+        draggable
     },
     methods: {
         setSelected(id){
@@ -50,6 +58,13 @@ export default {
             this.setSelected(id)
 
             this.$root.$emit('saveNotes')
+        },
+        dragged(e){
+            if(e.oldIndex === this.$parent.noteSelected){
+                this.$parent.noteSelected = e.newIndex
+            } else if(e.newIndex === this.$parent.noteSelected){
+                this.$parent.noteSelected = e.oldIndex
+            }
         }
     },
     mounted(){
@@ -158,6 +173,7 @@ export default {
 
             div:first-child{
                 user-select: none;
+                widows: 44px;
 
                 input{
                     display: none;
@@ -165,8 +181,8 @@ export default {
 
                     ~ label{
                         display: block;
-                        width: 32px;
-                        height: 32px;
+                        width: 28px;
+                        height: 28px;
                         border: 3px solid rgb(100,100,100);
                         border-radius: 25%;
                         display: flex;
@@ -190,6 +206,20 @@ export default {
             }
 
             div:last-child{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: calc(100% - 44px);
+
+                .handle{
+                    cursor: move;
+                    background: transparent;
+                    color: rgb(120,120,140);
+                    outline: 0;
+                    border: 0;
+                    font-size: 24px;
+                }
+
                 h1{
                     font-size: 16px;
                     opacity: 0.8;
